@@ -11,33 +11,34 @@ module.exports = () => {
   return {
     mode: 'development',
     entry: {
-      main: './src/js/index.js',
-      install: './src/js/install.js'
+      main: './src/js/index.js'
     },
     output: {
       filename: '[name].bundle.js',
       path: path.resolve(__dirname, 'dist')
     },
-    plugins: [
-      new HtmlWebpackPlugin({
-        template: './index.html',
-        title: 'Progressive Web App'
-      }),
-      new MiniCSSExtractPlugin(),
-      new InjectManifest({
-        swSrc: './src/src-sw.js',
-        swDest: 'src-sw.js'
-      })
-    ],
+    new GenerateSW(),
+    new WebpackPwaManifest({
+      name: 'Text Editor',
+      short_name: 'Text Editor',
+      description: 'A simple text editor',
+      background_color: '#ffffff',
+      theme_color: '#ffffff',
+      start_url: './',
+      publicPath: './',
+      icons: [
+        {
+          src: path.resolve('assets/images/logo.png'),
+          sizes: [96, 128, 192, 256, 384, 512],
+          destination: path.join('assets', 'icons'),
+        },
+      ]
+    }),
     module: {
       rules: [
         {
           test: /\.css$/i,
-          use: [MiniCSSExtractPlugin.loader, 'css-loader']
-        },
-        {
-          test: /\.(png|svg|jpg|jpeg|gif)$/i,
-          type: 'asset/resource'
+          use: ['style-loader', 'css-loader']
         },
         {
           test: /\.m?js$/,
@@ -45,7 +46,8 @@ module.exports = () => {
           use: {
             loader: 'babel-loader',
             options: {
-              presets: ['@babel/preset-env']
+              presets: ['@babel/preset-env'],
+              plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-transform-runtime']
             }
           }
         }
