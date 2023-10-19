@@ -26,5 +26,41 @@ warmStrategyCache({
 
 registerRoute(({ request }) => request.mode === 'navigate', pageCache);
 
-// TODO: Implement asset caching
-registerRoute();
+/**
+ * Create CSS and JS offline cache
+ */
+registerRoute(
+  ({ request }) => {
+    return (
+      request.destination === 'script' ||
+      request.destination === 'style'
+    );
+  },
+  new StaleWhileRevalidate({
+    cacheName: 'static-resources',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
+  })
+);
+
+/**
+ * Create image offline cache
+ */ 
+registerRoute(
+  ({ request}) => request.destination === 'images',
+  new CacheFirst({
+    cacheName: 'image-cache',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+      new ExpirationPlugin({
+        maxEntries: 20,
+        maxAgeSeconds: 30 * 24 * 60 * 60,
+      }),
+    ]
+  })
+);
