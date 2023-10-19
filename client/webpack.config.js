@@ -1,7 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const path = require('path');
-const { GenerateSW, InjectManifest } = require('workbox-webpack-plugin');
+const { InjectManifest } = require('workbox-webpack-plugin');
 
 /**
  * @description Webpack configuration
@@ -11,24 +11,30 @@ module.exports = () => {
   return {
     mode: 'development',
     entry: {
-      main: './src/js/index.js'
+      main: './src/js/index.js',
+      install: './src/js/install.js'
     },
     output: {
       filename: '[name].bundle.js',
       path: path.resolve(__dirname, 'dist')
     },
     plugins: [
+      // Webpack plugin to generate HTML file
       new HtmlWebpackPlugin({
         template: './index.html',
         title: 'Text Editor'
       }),
-      new MiniCssExtractPlugin(),
+
+      // Custom service worker
       new InjectManifest({
-        swSrc: './src/sw.js',
-        swDest: 'service-worker.js',
+        swSrc: './src-sw.js',
+        swDest: 'src-sw.js',
       }),
-      new GenerateSW(),
+
+      // Webpack plugin to generate manifest.json
       new WebpackPwaManifest({
+        fingerprints: false,
+        inject: true,
         name: 'Text Editor',
         short_name: 'Text Editor',
         description: 'A simple text editor',
@@ -38,7 +44,7 @@ module.exports = () => {
         publicPath: './',
         icons: [
           {
-            src: path.resolve('assets/images/logo.png'),
+            src: path.resolve('src/images/logo.png'),
             sizes: [96, 128, 192, 256, 384, 512],
             destination: path.join('assets', 'icons'),
           },
@@ -47,10 +53,11 @@ module.exports = () => {
     ],
     
     module: {
+      // Asset loaders
       rules: [
         {
           test: /\.css$/i,
-          use: [MiniCssExtractPlugin.loader, 'css-loader']
+          use: ['style-loader', 'css-loader']
         },
         {
           test: /\.(png|svg|jpg|jpeg|gif)$/i,

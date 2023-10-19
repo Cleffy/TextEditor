@@ -27,17 +27,12 @@ warmStrategyCache({
 registerRoute(({ request }) => request.mode === 'navigate', pageCache);
 
 /**
- * @description Create offline fallback for CSS and JS
+ * @description Create asset cache
  */
 registerRoute(
-  ({ request }) => {
-    return (
-      request.destination === 'script' ||
-      request.destination === 'style'
-    );
-  },
+  ({ request }) => ['style', 'script', 'worker'].includes(request.destination),
   new StaleWhileRevalidate({
-    cacheName: 'static-resources',
+    cacheName: 'asset-cache',
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200],
