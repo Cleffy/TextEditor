@@ -16,11 +16,11 @@ const initdb = async () =>
  * @description Method that adds content to the database
  * @param {} content 
  */
-export const putDb = async (content) => {
+export const putDb = async (id, content) => {
   const contentDB = await openDB('jate', 1);
   const tx = contentDB.transaction('jate', 'readwrite');
   const store = tx.objectStore('jate');
-  const result = await store.put(content);
+  const result = await store.put({id: id, content: content});
   console.log('Added to database:', result);
 };
 
