@@ -27,7 +27,7 @@ warmStrategyCache({
 registerRoute(({ request }) => request.mode === 'navigate', pageCache);
 
 /**
- * Create CSS and JS offline cache
+ * @description Create offline fallback for CSS and JS
  */
 registerRoute(
   ({ request }) => {
@@ -47,7 +47,7 @@ registerRoute(
 );
 
 /**
- * Create image offline cache
+ * @description Create offline fallback for images
  */ 
 registerRoute(
   ({ request}) => request.destination === 'images',
